@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.transaction_demo.dao.UserDao">
+    
+    <insert id="insertEmployee" parameterType="CompanyEmployee" >
+        INSERT INTO t_company_employee (userId,companyId) values (#{userId},#{companyId})
+    </insert>
+
+    <insert id="insertUserBasic" parameterType="UserBasic" >
+            INSERT INTO t_user_basic (userId,username,age) values (#{userId},#{username},#{age})
+    </insert>
+
+    <update id="updateUserBasic" parameterType="UserBasic" >
+        UPDATE t_user_basic SET  username = #{username} WHERE userId = #{userId}
+    </update>
+
+    <select id="queryUser" parameterType="UserBasic" resultType="UserBasic">
+        SELECT * FROM t_user_basic WHERE userId = #{userId}
+    </select>
+
+    
+</mapper>
