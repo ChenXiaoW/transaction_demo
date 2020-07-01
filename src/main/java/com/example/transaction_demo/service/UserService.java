@@ -3,6 +3,8 @@ package com.example.transaction_demo.service;
 import com.example.transaction_demo.model.CompanyEmployee;
 import com.example.transaction_demo.model.UserBasic;
 
+import java.util.List;
+
 /**
  * @author chenw
  * @title: UserService
@@ -20,6 +22,8 @@ public interface UserService {
     int updateUserBasic(UserBasic userBasic);
 
     int updateUserBasic2(UserBasic userBasic);
+
+    int insertUserBasic2(List<UserBasic> userBasics);
 
     UserBasic queryUser(UserBasic userBasic);
 }

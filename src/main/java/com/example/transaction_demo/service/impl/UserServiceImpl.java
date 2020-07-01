@@ -10,11 +10,13 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -43,9 +45,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    /*@Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)*/
     public void insertUserBasic(UserBasic userBasic) {
+        //1.获取事务定义
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //2.设置事务隔离级别，开启新事务
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        //3.获得事务状态
+        TransactionStatus status = transactionManager.getTransaction(def);
+        CompanyEmployee companyEmployee = new CompanyEmployee().setCompanyId("qeqwe").setUserId("ewqeq");
+        userDao.insertEmployee(companyEmployee);
         userDao.insertUserBasic(userBasic);
+        if(userBasic.getAge() == 2){
+
+            System.out.println("事务回滚");
+            //TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            transactionManager.rollback(status);
+        }else {
+            transactionManager.commit(status);
+        }
     }
 
     @Override
@@ -72,9 +90,9 @@ public class UserServiceImpl implements UserService {
     public int updateUserBasic(UserBasic userBasic) {
         //1.获取事务定义
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-//2.设置事务隔离级别，开启新事务
+        //2.设置事务隔离级别，开启新事务
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-//3.获得事务状态
+        //3.获得事务状态
         TransactionStatus status = transactionManager.getTransaction(def);
         int i = 0;
         try {
@@ -98,6 +116,33 @@ public class UserServiceImpl implements UserService {
 
         System.out.println("打印2:"+new Date());
         return i;
+    }
+
+    @Override
+    public int insertUserBasic2(List<UserBasic> userBasics) {
+        //1.获取事务定义
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+
+        for(int i = 0;i<userBasics.size();i++){
+
+            //2.设置事务隔离级别，开启新事务
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            //3.获得事务状态
+            TransactionStatus status = transactionManager.getTransaction(def);
+            //insertUserBasic(userBasics.get(i));
+            userDao.insertUserBasic(userBasics.get(i));
+            CompanyEmployee companyEmployee = new CompanyEmployee().setCompanyId("qeqwe").setUserId("ewqeq");
+            userDao.insertEmployee(companyEmployee);
+            if(userBasics.get(i).getAge() %2 == 0){
+
+                System.out.println("事务回滚"+userBasics.get(i).toString());
+                //TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                transactionManager.rollback(status);
+            }else {
+                transactionManager.commit(status);
+            }
+        }
+        return 0;
     }
 
     @Override
